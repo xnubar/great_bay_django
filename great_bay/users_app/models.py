@@ -16,3 +16,7 @@ class Customer(User):
         self.is_staff = True
         return super().save(*args, **kwargs)
 
+ 
+        
+
+

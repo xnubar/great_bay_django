@@ -1,52 +1,35 @@
-var config = {
-    apiKey: "AIzaSyD3Oielphk3Lo6jChsJuCKuruWe_2Pcsm0",
-    authDomain: "avaz-be565.firebaseapp.com",
-    databaseURL: "https://avaz-be565.firebaseio.com",
-    projectId: "avaz-be565",
-};
-firebase.initializeApp(config);
 
-var database = firebase.database()
+$(document).on("click", "li", function () {
 
-var fullnames=[];
-var users=[];
-database.ref("/messages").on("value", function (snap) {
-
-
-    let messages = snap.val();
-    for (let i in messages) {
-        let message = messages[i];
-        if(fullnames.indexOf(message.fullname)==-1){
-            fullnames.push(message.fullname)
-
-        }
-    }
-    loadMessages(fullnames)
-})
-
-
-function loadMessages(arr) {
-    $(".messages-container").empty();
-
-    for(let i in arr){
-        let li=$("<li>");
-
-        let a =$("<a>");
-        $(a).html(arr[i])
-        $(li).append(a);
-        $(li).data("email",arr[i])
-    
-        $(".messages-container").append(li)
-    }
-}
-
-$(document).on("click","li",function(){
-    
     $(".chat-window").show();
 
     $(".user-msg").html($(this).data("email"))
 })
+function getProducts() {
+    // setInterval(function () {
+       
+            $.ajax({
+                url: "{% url '/products/getall/' %}",
+                method: "GET",
+                headers: {"X-CSRFToken": getCookie("csrftoken")},
+                crossDomain: false,
+                success: function (data) {
+                    // response_json = JSON.parse(data)
+                    print(data)
+                    // $('body').html(response_json.html_data);
+                    //   var=response_json.variable_value; 
+                }
+            });
+        
+    // }, 1000)
 
+}
+$(document).on("click", "li", function (e) {
+    $(".page-content").empty()
+    print("hiii")
+    getProducts()
+  
+})
 $(document).on('click', '.panel-heading span.icon_minim', function (e) {
     var $this = $(this);
     if (!$this.hasClass('panel-collapsed')) {
@@ -66,14 +49,4 @@ $(document).on('focus', '.panel-footer input.chat_input', function (e) {
         $('#minim_chat_window').removeClass('panel-collapsed');
         $('#minim_chat_window').removeClass('fa-plus').addClass('fa-minus');
     }
-});
-$(document).on('click', '#new_chat', function (e) {
-    var size = $( ".chat-window:last-child" ).css("margin-left");
-     size_total = parseInt(size) + 400;
-    alert(size_total);
-    var clone = $( "#chat_window_1" ).clone().appendTo( ".container" );
-    clone.css("margin-left", size_total);
-});
-$(document).on('click', '.icon_close', function (e) {
-    $( "#chat_window_1" ).hide();
 });

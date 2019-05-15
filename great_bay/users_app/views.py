@@ -3,7 +3,7 @@ from .models import Customer
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-
+from django.contrib.auth.models import User
 
 def logout_view(request):
     logout(request)
@@ -16,8 +16,6 @@ def registration(request):
         username = request.POST.get("username","")
         password = request.POST.get("password","")
         user_type = request.POST.get("user_type")
-        print("password: ",password)
-        print("type is = ",user_type)
         customer = Customer(first_name=first_name, last_name=last_name, 
         username = username, password=password, user_type = user_type)
         customer.save()
@@ -30,7 +28,15 @@ def registration(request):
 def homepage(request):
     if not request.user.is_authenticated:
         return redirect("login")
-    return render(request, "homepage.html")
+    user = Customer.objects.get(username=request.user)
+    context = {
+        "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name
+    }
+    if user.user_type == Customer.CUSTOMER_TYPE_CONSUMER:
+        return render(request, "consumer_profile.html",context = context)
+    return render(request, "owner_profile.html", context=context)
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -38,11 +44,21 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get("username","")
         password = request.POST.get("password","")
-        print("username: ",username)
-        print("password: ",password)
         user = authenticate(username=username, password = password)
-        print("user = ",user)
         if user is not  None:
             login(request, user)
+           
             return redirect("homepage")
     return render(request,"login.html")
+
+
+def consumer_view(request):
+    pass
+
+
+
+def owner_view(request):
+    pass
+
+
+        
